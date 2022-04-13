@@ -29,14 +29,14 @@ var doThingsAndStuff = (function(x) {
               } else if (!isFound) {
                 continue;
               }
-              // !temp2.charCodeAt(tmep3) will evaluate to false unless tmep3 refers to an invalid index position (5 in "hi", for example)
-              // Looks like temp2.charCodeAt(tmep3) is being compared to temp[temp4].charCodeAt(y) for a lt(<), eq(=), or lt(>) comparison... possibly sorting?
+              // !temp2.charCodeAt(tmep3) will be skipped unless tmep3 indexes into a part of temp2 that doesn't exist
+              // 
               if (!temp2.charCodeAt(tmep3) || temp2.charCodeAt(tmep3) < temp[temp4].charCodeAt(y)) {
                 temp4--;
                 if (temp4 < 0) {
                   temp4 = 0;
                 }
-                temp.splice(temp4, 0, temp2); // Remove 0 items from temp at index temp4 and insert things from temp2 in their not so removed place?
+                temp.splice(temp4, 0, temp2);
                 doBreak = true;
                 break;
               } else if (temp2.charCodeAt(tmep3) == temp[temp4].charCodeAt(y)) {
@@ -50,10 +50,10 @@ var doThingsAndStuff = (function(x) {
           }
           isFound = false;
           for (temp4 = 0; temp4 < temp.length; temp4++)
-            if (temp2 === temp[temp4]) {
-              isFound = true;
-              break;
-            }
+          if (temp2 === temp[temp4]) {
+            isFound = true;
+            break;
+          }
           // Logic to see if we should add it
           if (!isFound) {
             temp.push(temp2);
@@ -67,11 +67,19 @@ var doThingsAndStuff = (function(x) {
     };
   });
 
-console.log(doThingsAndStuff([
-          "some",
-          " ",
-          "text"
-        ]));
+var x = [
+  "some",
+  "    ",
+  "text",
+  "    ",
+  "blah",
+  "    "
+];
+
+doThingsAndStuff(x);
+
+console.log(x);
 
 exports.doThingsAndStuff = doThingsAndStuff;
+exports.x = x;
 /*  Not a pure module */

@@ -65,4 +65,8 @@ let doThingsAndStuff = %raw(`
   }
 `)
 
-Js.log(doThingsAndStuff(["some", " ", "text"]))
+// Js.log(doThingsAndStuff(["some", " ", "text"]))
+
+let x = ["some", "    ", "text", "    ", "blah", "    "];
+doThingsAndStuff(x);
+Js.log(x);
