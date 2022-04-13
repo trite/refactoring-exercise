@@ -1,10 +1,16 @@
 {
   "name": "rescript-project-template",
   "version": "0.0.1",
-  "sources": {
-    "dir" : "src",
-    "subdirs" : true
-  },
+  "sources": [
+    {
+      "dir" : "src",
+      "subdirs" : true
+    },
+    {
+      "dir": "__tests__",
+      "type": "dev"
+    }
+  ],
   "package-specs": {
     "module": "commonjs",
     "in-source": true
@@ -15,4 +21,5 @@
   "warnings": {
     "error" : "+101"
   },
+  "bs-dev-dependencies": ["@glennsl/rescript-jest"]
 }
