@@ -91,21 +91,9 @@ function insertAt(start, toInsert, arr) {
             ]);
 }
 
-console.log(insertAt(0, "blah", [
-          "asdf",
-          "asdf2"
-        ]));
-
-console.log(insertAt(1, "blah", [
-          "asdf",
-          "asdf2"
-        ]));
-
-console.log(insertAt(2, "blah", [
-          "asdf",
-          "asdf2"
-        ]));
+var nextAction;
 
 exports.doThingsAndStuff = doThingsAndStuff;
 exports.insertAt = insertAt;
-/*  Not a pure module */
+exports.nextAction = nextAction;
+/* No side effect */
