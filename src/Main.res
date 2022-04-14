@@ -64,7 +64,7 @@ let doThingsAndStuff = %raw(`
                             break;
                         }
 
-                    // If item isn't previously in temp and meets other criteria to be added, add it
+                    // If item isn't previously in temp add it to the end of the array
                     if (!isFound) {
                         temp.push(temp2);
                     }
@@ -78,8 +78,23 @@ let doThingsAndStuff = %raw(`
     }
 `)
 
+// let test = [1,2,3,4,5]
+// let test2 = test
+
+let insertAt = (start: int, toInsert: 'a, arr: array<'a>): array<'a> => {
+    let arrStart = Belt.Array.slice(arr, ~offset=0, ~len=start)
+    let arrEnd = Belt.Array.slice(arr, ~offset=start, ~len=Belt.Array.length(arr)-start)
+    Belt.Array.concatMany([arrStart, [toInsert], arrEnd])
+}
+
+Js.log(insertAt(0, "blah", ["asdf", "asdf2"]))
+Js.log(insertAt(1, "blah", ["asdf", "asdf2"]))
+Js.log(insertAt(2, "blah", ["asdf", "asdf2"]))
+// Js.log(Js.Array.concat(["blah"], ["asdf", "asdf2"]))
+// Js.log([1,2,3][range(0,1)])
+
 // Js.log(doThingsAndStuff(["some", " ", "text"]))
 
-let x = ["some", "    ", "text", "    ", "blah", "    "];
-doThingsAndStuff(x);
-Js.log(x);
+// let x = ["some", "    ", "text", "    ", "blah", "    "];
+// doThingsAndStuff(x);
+// Js.log(x);

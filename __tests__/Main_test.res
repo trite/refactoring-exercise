@@ -1,9 +1,29 @@
 open Jest;
 
-describe("Main", () => {
+describe("Main - insertAt", () => {
     open Main;
     open Expect;
 
+    // insertAt tests
+    test("insertAt 0 inserts at start", () =>
+        expect(insertAt(0, "foo", ["bar", "baz"])) -> toEqual(["foo", "bar", "baz"]))
+
+    test("insertAt 1 inserts at position 1", () =>
+        expect(insertAt(1, "foo", ["bar", "baz"])) -> toEqual(["bar", "foo", "baz"]))
+
+    test("insertAt 2 inserts at position 2", () =>
+        expect(insertAt(2, "foo", ["bar", "baz"])) -> toEqual(["bar", "baz", "foo"]))
+
+    test("insertAt beyond array range inserts at last position", () =>
+        expect(insertAt(3, "foo", ["bar", "baz"])) -> toEqual(["bar", "baz", "foo"]))
+
+});
+
+describe("Main - doThingsAndStuff", () => {
+    open Main;
+    open Expect;
+
+    // doThingsAndStuff tests
     let testExpect = (toSort, expectedResult, msg) => {
         doThingsAndStuff(toSort) |> ignore
         test(msg, () => expect(toSort) -> toEqual(expectedResult))
