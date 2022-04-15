@@ -83,48 +83,48 @@ describe("Main - insertAt", () => {
         expect(insertAt(-1, "foo", ["bar", "baz"])) -> toEqual(["foo", "bar", "baz"]))
 });
 
-describe("Main - advanceState1", () => {
-    open Main;
-    open Expect;
+// describe("Main - advanceState1", () => {
+//     open Main;
+//     open Expect;
 
-    test("move last element into examining, examPosition set to 0", () =>
-        expect(
-            advanceState1(
-                {
-                    pullFrom: [" foo", "bar ", "a", "b"],
-                    pushTo: []
-                }
-            )
-        )
-        -> toEqual(
-            State2({
-                pullFrom: [ " foo", "bar ", "a" ],
-                pushTo: [],
-                examining: "b",
-                examPosition: 0,
-                spaceInExam: false
-            })
-        ))
-});
+//     test("move last element into examining, examPosition set to 0", () =>
+//         expect(
+//             advanceState1(
+//                 {
+//                     pullFrom: [" foo", "bar ", "a", "b"],
+//                     pushTo: []
+//                 }
+//             )
+//         )
+//         -> toEqual(
+//             State2({
+//                 pullFrom: [ " foo", "bar ", "a" ],
+//                 pushTo: [],
+//                 examining: "b",
+//                 examPosition: 0,
+//                 spaceInExam: false
+//             })
+//         ))
+// });
 
-describe("Main - compare doThingsAndStuff with newVersion", () => {
-    open Main;
-    open Expect;
-    open Js.Array;
+// describe("Main - compare doThingsAndStuff with newVersion", () => {
+//     open Main;
+//     open Expect;
+//     open Js.Array;
 
-    let compareTest = (msg, arr) => {
-        let left = newVersion(copy(arr))
-        let right = copy(arr)
-        doThingsAndStuff(right) |> ignore
+//     let compareTest = (msg, arr) => {
+//         let left = newVersion(copy(arr))
+//         let right = copy(arr)
+//         doThingsAndStuff(right) |> ignore
 
-        test(msg, () => expect(left) -> toEqual(right))
-    }
+//         test(msg, () => expect(left) -> toEqual(right))
+//     }
 
-    compareTest("2 kepts strings", [" foo", "bar "])
-    compareTest("1 kept, 2 dropped", ["foo", " ", "bar"])
-    compareTest("3 kept, 2 dropped", ["   ", "foo", " ", "bar", "     "])
-    compareTest("ordering of only spaces", ["     ", " ", "   "])
-    compareTest("ordering of only spaces slightly different order", ["     ", "   ", " "])
-    compareTest("lots of strings with numbers", ["1", " 2", "3 ", " 4 ", "  5", "6  ", "  7  ", "8 8 8", " 9 9 "])
-    compareTest("lots of string with letters", ["a", " b", "c ", "d", "eeeee", "f  f", "gg", "  "])
-});
+//     compareTest("2 kepts strings", [" foo", "bar "])
+//     compareTest("1 kept, 2 dropped", ["foo", " ", "bar"])
+//     compareTest("3 kept, 2 dropped", ["   ", "foo", " ", "bar", "     "])
+//     compareTest("ordering of only spaces", ["     ", " ", "   "])
+//     compareTest("ordering of only spaces slightly different order", ["     ", "   ", " "])
+//     compareTest("lots of strings with numbers", ["1", " 2", "3 ", " 4 ", "  5", "6  ", "  7  ", "8 8 8", " 9 9 "])
+//     compareTest("lots of string with letters", ["a", " b", "c ", "d", "eeeee", "f  f", "gg", "  "])
+// });

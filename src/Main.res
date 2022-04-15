@@ -86,349 +86,48 @@ let insertAt = (start: int, toInsert: 'a, arr: array<'a>): array<'a> => {
     Belt.Array.concatMany([arrStart, [toInsert], arrEnd])
 }
 
-// type state<'a> =
-// {
-//     pullFrom: array<'a>,
-//     pushTo: array<'a>
-
-// }
-
-type action<'a> =
-    | InsertAt(int, 'a, array<'a>)
-    | Drop
-
-// let nextAction = ()
-
-type state1<'a> =
+type base<'a> =
 {
     pullFrom: array<'a>,
     pushTo: array<'a>
 }
 
-type state2<'a> =
-{
-    pullFrom: array<'a>,
-    pushTo: array<'a>,
-    examining: 'a,
-    examPosition: int,
-    spaceInExam: bool
-}
-
-type state3<'a> =
+type examining<'a> =
 {
     pullFrom: array<'a>,
     pushTo: array<'a>,
 
-    examining: 'a,
-    examPositionReset: int,
+    exam: 'a,
     examPosition: int,
-    spaceInExam: bool,
-
-    comparing: 'a,
-    comparingSource: int,
-    comparePosition: int,
-    spaceInCompare: bool
+    examSpaceFound: bool
 }
 
-// type state4<'a> =
-// {
+type preparing<'a> =
+{
+    pullFrom: array<'a>,
+    pushTo: array<'a>,
 
-// }
+    exam: 'a,
+    examPosition: int,
+    examSpaceFound: bool,
+    examResetPosition: int
 
-type doneState<'a> =
-    array<'a>
-
-type anyState<'a> =
-    State1(state1<'a>)
-    | State2(state2<'a>)
-    | State3(state3<'a>)
-    | DoneState(doneState<'a>)
-
-type workingStates<'a> =
-    State1(state1<'a>)
-    | State2(state2<'a>)
-    | State3(state3<'a>)
-
-type state2orDone<'a> =
-    State2(state2<'a>)
-    | DoneState(doneState<'a>)
-
-type state1or3<'a> =
-    State1(state1<'a>)
-    | State3(state3<'a>)
-
-// let advanceState1 = (state: state1<'a>): state2orDone<'a> => {
-let advanceState1 = (state: state1<'a>): anyState<'a> => {
-    open Belt.Array
-
-    let len =
-        state.pullFrom
-        |> length
-
-    if (len > 0) {
-        // pop the end element off and pass it to be examined
-        let rest =
-            slice(state.pullFrom, ~offset=0, ~len=len-1)
-
-        let pop =
-            state.pullFrom[len-1]
-
-        State2({
-            pullFrom: rest,
-            pushTo: state.pushTo,
-
-            examining: pop,
-            examPosition: 0,
-            spaceInExam: false
-        })
-    } else {
-        // nothing to do, return the original
-        DoneState(state.pushTo)
-    }
-}
-
-// Js.log(advanceState1(
-//     {
-//         pullFrom: [" foo", "bar ", "a", "b"],
-//         pushTo: []
-//     }
-// ))
-
-let arrContains = (lookFor: string, arr: array<string>): bool => {
-    Belt.Option.isSome(Js.Array.find(x => x == lookFor, arr))
-}
-
-// let advanceState2 = (state: state2<string>): workingStates<string> => {
-let advanceState2 = (state: state2<string>): anyState<string> => {
-    // if (Js.Array.length(state.pushTo) > 0) {
-
-
-    let charTest =
-        state.examining
-        |> Js.String.charCodeAt(state.examPosition)
-
-    let nextPosition = state.examPosition + 1
-
-    if (charTest == 32.0) {
-        Js.log("as2 path 1")
-        if (Js.Array.length(state.pushTo) > 0) {
-            Js.log("as2 path 1.1")
-            // Character being tested is a space, begin comparing the position after it with values in the "pushTo" field
-            State3({
-                pullFrom: state.pullFrom,
-                pushTo: state.pushTo,
-
-                examining: state.examining,
-                examPositionReset: nextPosition,
-                examPosition: nextPosition,
-                spaceInExam: true,
-
-                comparing: state.pushTo[0],
-                comparingSource: 0,
-                comparePosition: 0,
-                spaceInCompare: false
-            })
-        } else {
-            Js.log("as2 path 1.2")
-            State2({
-                ...state,
-                spaceInExam: true,
-                examPosition: nextPosition
-            })
-            // let pushTo =
-            //     // if (state.spaceInExam && Belt.Option.isNone(Js.Array.find(x => x == state.examining, state.pushTo))) {
-            //     if (state.spaceInExam && arrContains(state.examining, state.pushTo)) {
-            //         Belt.Array.concat(state.pushTo, [state.examining])
-            //     } else {
-            //         state.pushTo
-            //     }
-
-            // State1({
-            //     pullFrom: state.pullFrom,
-            //     pushTo: pushTo
-            // })
-        }
-    } else if (Js.Float.isNaN(charTest)) {
-        Js.log("as2 path 2")
-        // End of the string, add the item to "pushTo" if it contained a space
-        let pushTo =
-            // if (state.spaceInExam && Belt.Option.isNone(Js.Array.find(x => x == state.examining, state.pushTo))) {
-            if (state.spaceInExam && !arrContains(state.examining, state.pushTo)) {
-                Js.log("as2 path 2.1")
-                Belt.Array.concat(state.pushTo, [state.examining])
-            } else {
-                Js.log("as2 path 2.1")
-                state.pushTo
-            }
-
-        State1({
-            pullFrom: state.pullFrom,
-            pushTo: pushTo
-        })
-    } else {
-        Js.log("as2 path 3")
-        // Not a space but not the end of the string, just advance the pointer
-        State2({
-            ...state,
-            examPosition: nextPosition
-        })
-    }
-    // } else {
-
-    // }
 
 }
 
-// let advanceState3 = (state: state3<string>): state1or3<string> => {
-let advanceState3 = (state: state3<string>): anyState<string> => {
-    open Js.String
-    open Js.Float
-    Js.log("as3 open")
+type comparing<'a> =
+{
+    pullFrom: array<'a>,
+    pushTo: array<'a>,
 
-    if (state.spaceInCompare) {
-        Js.log("top of if")
-        // do comparison for where to insert
+    exam: 'a,
+    examPosition: int,
+    examSpaceFound: bool,
+    examResetPosition: int
 
-        let examCharCode =
-            state.examining
-            |> charCodeAt(state.examPosition)
 
-        let compareCharCode =
-            state.comparing
-            |> charCodeAt(state.comparePosition)
-
-        if (isNaN(examCharCode) || examCharCode < compareCharCode ) {
-            Js.log("as3 path 1")
-            
-            State1({
-                pullFrom: state.pullFrom,
-                pushTo: state.pushTo |> insertAt(state.comparingSource - 1, state.examining)
-            })
-        } else if (examCharCode == compareCharCode) {
-            Js.log("as3 path 2")
-
-            State3({
-                ...state,
-                examPosition: state.examPosition + 1,
-            })
-        } else {
-            Js.log("as3 path 3")
-
-            let pushTo =
-                if (arrContains(state.examining, state.pushTo)) {
-                    state.pushTo
-                } else {
-                    Belt.Array.concat(state.pushTo, [state.examining])
-                }
-
-            State1({
-                pullFrom: state.pullFrom,
-                pushTo: pushTo
-            })
-        }
-    } else {
-        Js.log("bottom of if")
-
-        // checking for spaces still
-        let examCharTest =
-            state.examining
-            |> charCodeAt(state.examPosition)
-
-        let compareCharTest =
-            state.comparing
-            |> charCodeAt(state.comparePosition)
-
-        // Js.log(charTest)
-        if (isNaN(examCharTest)) {
-            Js.log("=====================")
-            // let pushTo =
-            //     (state.spaceInExam && (compareCharTest != 32.0))
-            //         ? Belt.Array.concat([state.examining], state.pushTo)
-            //         : Belt.Array.concat(state.pushTo, [state.examining])
-            let pushTo =
-                if state.spaceInExam {
-                    if compareCharTest == 32.0 {
-                        Belt.Array.concat(state.pushTo, [state.examining])
-                    } else {
-                        Belt.Array.concat([state.examining], state.pushTo)
-                    }
-                } else {
-                    state.pushTo
-
-                }
-
-            State1({
-                pullFrom: state.pullFrom,
-                pushTo: pushTo
-            })
-        } else {
-            Js.log("===else===")
-            let spaces = examCharTest == 32.0
-
-            State3({
-                ...state,
-                examPosition: state.examPosition + 1,
-                spaceInCompare: spaces || state.spaceInCompare
-            })
-        }
-    }
 }
 
-let rec newVersionInner = (outerState: anyState<string>): array<string> => {
-    Js.log(outerState)
-    switch outerState {
-        | State1(state) =>
-            state
-            |> advanceState1
-            |> newVersionInner
-            // newVersionInner(advanceState1(state))
-        | State2(state) =>
-            state
-            |> advanceState2
-            |> newVersionInner
-        | State3(state) =>
-            state
-            |> advanceState3
-            |> newVersionInner
-        | DoneState(result) =>
-            result
-            |> Belt.Array.reverse
-    }
-}
-
-let newVersion = (arr: array<string>): array<string> => {
-    newVersionInner(State1({
-        pullFrom: arr,
-        pushTo: []
-    }))
-}
-
-// Js.log(newVersion({
-//     pullFrom: [" foo", "bar "],
-//     pushTo: []
-// }))
-
-// Js.log(newVersion([" foo", "bar "]))
-
-let checking = (arr: array<string>) => {
-    let left = newVersion(Js.Array.copy(arr))
-    let right = Js.Array.copy(arr)
-    doThingsAndStuff(right) |> ignore
-
-    // if (left == right) {
-
-    // }
-
-    Js.log("===================")
-    Js.log(left)
-    Js.log(right)
-    Js.log("")
-}
-
-checking([" foo", "bar "])
-checking(["foo", " ", "bar"])
-checking(["   ", "foo", " ", "bar", "     "])
-checking(["     ", " ", "   "])
-checking(["     ", "   ", " "])
-checking(["1", " 2", "3 ", " 4 ", "  5", "6  ", "  7  ", "8 8 8", " 9 9 "])
-checking(["a", " b", "c ", "d", "eeeee", "f  f", "gg", "  "])
+let x = ["a", " b", "c ", "d", "eeeee", "f  f", "gg", "  "]
+doThingsAndStuff(x) |> ignore
+Js.log(x)

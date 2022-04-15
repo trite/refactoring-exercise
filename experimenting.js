@@ -11,13 +11,13 @@ var doThingsAndStuff = x => {
             if (temp2 && temp2.charCodeAt(tmep3) == 32) { // is the character at this point a space?
             var start = tmep3++ + 1; // increment tmep3 by 1, set start to that same value in a terrible way
             var doBreak = false; // break clause to skip additional iterations in some situations
-            var isFound = false; // whether the thing we're looking for was found -- looks like this makes the comparison happen if a space has occurred in the string previously
+            // var isFound = false; // whether the thing we're looking for was found -- looks like this makes the comparison happen if a space has occurred in the string previously
             for (temp4 = 0; temp4 < temp.length; temp4++) { // iterate through items in temp (shouldn't be anything on the first pass)
                 if (doBreak) {
                     break;
                 }
                 tmep3 = start; // tmep3 can be incremented below potentially, so this might matter
-                isFound = false;
+                var isFound = false;
                 for (var y = 0; y < temp[temp4].length; y++) { // iterate through the string currently being looked at from `temp` array
 
                     // If the string contains a space, then the code after this can run
@@ -54,7 +54,7 @@ var doThingsAndStuff = x => {
                     }
                 }
             }
-            isFound = false;
+            var isFound = false;
 
             // Only add items that aren't already added, hence why the same amount of spaces are only added once
             for (temp4 = 0; temp4 < temp.length; temp4++) // this also shouldn't run on first pass
@@ -108,3 +108,4 @@ var doThingsAndStuff = x => {
 
 var x = ["a", " b", "c ", "d", "eeeee", "f  f", "gg", "  "];
 doThingsAndStuff(x);
+console.log(x);
