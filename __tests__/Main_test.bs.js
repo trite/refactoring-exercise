@@ -4,49 +4,6 @@
 var Jest = require("@glennsl/rescript-jest/src/jest.bs.js");
 var Main = require("../src/Main.bs.js");
 
-Jest.describe("Main - insertAt", (function (param) {
-        Jest.test("insertAt 0 inserts at start", (function (param) {
-                return Jest.Expect.toEqual(Jest.Expect.expect(Main.insertAt(0, "foo", [
-                                    "bar",
-                                    "baz"
-                                  ])), [
-                            "foo",
-                            "bar",
-                            "baz"
-                          ]);
-              }));
-        Jest.test("insertAt 1 inserts at position 1", (function (param) {
-                return Jest.Expect.toEqual(Jest.Expect.expect(Main.insertAt(1, "foo", [
-                                    "bar",
-                                    "baz"
-                                  ])), [
-                            "bar",
-                            "foo",
-                            "baz"
-                          ]);
-              }));
-        Jest.test("insertAt 2 inserts at position 2", (function (param) {
-                return Jest.Expect.toEqual(Jest.Expect.expect(Main.insertAt(2, "foo", [
-                                    "bar",
-                                    "baz"
-                                  ])), [
-                            "bar",
-                            "baz",
-                            "foo"
-                          ]);
-              }));
-        return Jest.test("insertAt beyond array range inserts at last position", (function (param) {
-                      return Jest.Expect.toEqual(Jest.Expect.expect(Main.insertAt(3, "foo", [
-                                          "bar",
-                                          "baz"
-                                        ])), [
-                                  "bar",
-                                  "baz",
-                                  "foo"
-                                ]);
-                    }));
-      }));
-
 Jest.describe("Main - doThingsAndStuff", (function (param) {
         var testExpect = function (toSort, expectedResult, msg) {
           Main.doThingsAndStuff(toSort);
@@ -241,6 +198,76 @@ Jest.describe("Main - doThingsAndStuff", (function (param) {
                     "   ",
                     " "
                   ], "spaces that finish reordering on second run");
+      }));
+
+Jest.describe("Main - insertAt", (function (param) {
+        Jest.test("insertAt 0 inserts at start", (function (param) {
+                return Jest.Expect.toEqual(Jest.Expect.expect(Main.insertAt(0, "foo", [
+                                    "bar",
+                                    "baz"
+                                  ])), [
+                            "foo",
+                            "bar",
+                            "baz"
+                          ]);
+              }));
+        Jest.test("insertAt 1 inserts at position 1", (function (param) {
+                return Jest.Expect.toEqual(Jest.Expect.expect(Main.insertAt(1, "foo", [
+                                    "bar",
+                                    "baz"
+                                  ])), [
+                            "bar",
+                            "foo",
+                            "baz"
+                          ]);
+              }));
+        Jest.test("insertAt 2 inserts at position 2", (function (param) {
+                return Jest.Expect.toEqual(Jest.Expect.expect(Main.insertAt(2, "foo", [
+                                    "bar",
+                                    "baz"
+                                  ])), [
+                            "bar",
+                            "baz",
+                            "foo"
+                          ]);
+              }));
+        return Jest.test("insertAt beyond array range inserts at last position", (function (param) {
+                      return Jest.Expect.toEqual(Jest.Expect.expect(Main.insertAt(3, "foo", [
+                                          "bar",
+                                          "baz"
+                                        ])), [
+                                  "bar",
+                                  "baz",
+                                  "foo"
+                                ]);
+                    }));
+      }));
+
+Jest.describe("Main - advanceState1", (function (param) {
+        return Jest.test("move last element into examining, examPosition set to 0", (function (param) {
+                      return Jest.Expect.toEqual(Jest.Expect.expect(Main.advanceState1({
+                                          pullFrom: [
+                                            " foo",
+                                            "bar ",
+                                            "a",
+                                            "b"
+                                          ],
+                                          pushTo: []
+                                        })), {
+                                  TAG: /* State2 */1,
+                                  _0: {
+                                    pullFrom: [
+                                      " foo",
+                                      "bar ",
+                                      "a"
+                                    ],
+                                    pushTo: [],
+                                    examining: "b",
+                                    examPosition: 0,
+                                    spaceInExam: false
+                                  }
+                                });
+                    }));
       }));
 
 /*  Not a pure module */

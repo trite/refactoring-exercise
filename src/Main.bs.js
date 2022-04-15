@@ -2,6 +2,9 @@
 'use strict';
 
 var Belt_Array = require("rescript/lib/js/belt_Array.js");
+var Caml_array = require("rescript/lib/js/caml_array.js");
+var Belt_Option = require("rescript/lib/js/belt_Option.js");
+var Caml_option = require("rescript/lib/js/caml_option.js");
 
 var doThingsAndStuff = (function(x) {
         var temp = [];
@@ -91,9 +94,264 @@ function insertAt(start, toInsert, arr) {
             ]);
 }
 
-var nextAction;
+function advanceState1(state) {
+  var len = state.pullFrom.length;
+  if (len <= 0) {
+    return {
+            TAG: /* DoneState */3,
+            _0: state.pushTo
+          };
+  }
+  var rest = Belt_Array.slice(state.pullFrom, 0, len - 1 | 0);
+  var pop = Caml_array.get(state.pullFrom, len - 1 | 0);
+  return {
+          TAG: /* State2 */1,
+          _0: {
+            pullFrom: rest,
+            pushTo: state.pushTo,
+            examining: pop,
+            examPosition: 0,
+            spaceInExam: false
+          }
+        };
+}
+
+function arrContains(lookFor, arr) {
+  return Belt_Option.isSome(Caml_option.undefined_to_opt(arr.find(function (x) {
+                      return x === lookFor;
+                    })));
+}
+
+function advanceState2(state) {
+  var charTest = state.examining.charCodeAt(state.examPosition);
+  var nextPosition = state.examPosition + 1 | 0;
+  if (charTest === 32.0) {
+    if (state.pushTo.length > 0) {
+      return {
+              TAG: /* State3 */2,
+              _0: {
+                pullFrom: state.pullFrom,
+                pushTo: state.pushTo,
+                examining: state.examining,
+                examPositionReset: nextPosition,
+                examPosition: nextPosition,
+                spaceInExam: true,
+                comparing: Caml_array.get(state.pushTo, 0),
+                comparingSource: 0,
+                comparePosition: 0,
+                spaceInCompare: false
+              }
+            };
+    } else {
+      return {
+              TAG: /* State2 */1,
+              _0: {
+                pullFrom: state.pullFrom,
+                pushTo: state.pushTo,
+                examining: state.examining,
+                examPosition: nextPosition,
+                spaceInExam: true
+              }
+            };
+    }
+  }
+  if (!Number.isNaN(charTest)) {
+    return {
+            TAG: /* State2 */1,
+            _0: {
+              pullFrom: state.pullFrom,
+              pushTo: state.pushTo,
+              examining: state.examining,
+              examPosition: nextPosition,
+              spaceInExam: state.spaceInExam
+            }
+          };
+  }
+  var pushTo = state.spaceInExam && !arrContains(state.examining, state.pushTo) ? Belt_Array.concat(state.pushTo, [state.examining]) : state.pushTo;
+  return {
+          TAG: /* State1 */0,
+          _0: {
+            pullFrom: state.pullFrom,
+            pushTo: pushTo
+          }
+        };
+}
+
+function advanceState3(state) {
+  if (state.spaceInCompare) {
+    var examCharCode = state.examining.charCodeAt(state.examPosition);
+    var compareCharCode = state.comparing.charCodeAt(state.comparePosition);
+    if (Number.isNaN(examCharCode) || examCharCode < compareCharCode) {
+      return {
+              TAG: /* State1 */0,
+              _0: {
+                pullFrom: state.pullFrom,
+                pushTo: insertAt(state.comparingSource - 1 | 0, state.examining, state.pushTo)
+              }
+            };
+    }
+    if (examCharCode === compareCharCode) {
+      return {
+              TAG: /* State3 */2,
+              _0: {
+                pullFrom: state.pullFrom,
+                pushTo: state.pushTo,
+                examining: state.examining,
+                examPositionReset: state.examPositionReset,
+                examPosition: state.examPosition + 1 | 0,
+                spaceInExam: state.spaceInExam,
+                comparing: state.comparing,
+                comparingSource: state.comparingSource,
+                comparePosition: state.comparePosition,
+                spaceInCompare: state.spaceInCompare
+              }
+            };
+    }
+    var pushTo = arrContains(state.examining, state.pushTo) ? state.pushTo : Belt_Array.concat(state.pushTo, [state.examining]);
+    return {
+            TAG: /* State1 */0,
+            _0: {
+              pullFrom: state.pullFrom,
+              pushTo: pushTo
+            }
+          };
+  }
+  var charTest = state.examining.charCodeAt(state.examPosition);
+  if (Number.isNaN(charTest)) {
+    var pushTo$1 = state.spaceInExam ? Belt_Array.concat(state.pushTo, [state.examining]) : state.pushTo;
+    return {
+            TAG: /* State1 */0,
+            _0: {
+              pullFrom: state.pullFrom,
+              pushTo: pushTo$1
+            }
+          };
+  }
+  var spaces = charTest === 32.0;
+  return {
+          TAG: /* State3 */2,
+          _0: {
+            pullFrom: state.pullFrom,
+            pushTo: state.pushTo,
+            examining: state.examining,
+            examPositionReset: state.examPositionReset,
+            examPosition: state.examPosition + 1 | 0,
+            spaceInExam: state.spaceInExam,
+            comparing: state.comparing,
+            comparingSource: state.comparingSource,
+            comparePosition: state.comparePosition,
+            spaceInCompare: spaces || state.spaceInCompare
+          }
+        };
+}
+
+function newVersionInner(_outerState) {
+  while(true) {
+    var outerState = _outerState;
+    switch (outerState.TAG | 0) {
+      case /* State1 */0 :
+          _outerState = advanceState1(outerState._0);
+          continue ;
+      case /* State2 */1 :
+          _outerState = advanceState2(outerState._0);
+          continue ;
+      case /* State3 */2 :
+          _outerState = advanceState3(outerState._0);
+          continue ;
+      case /* DoneState */3 :
+          return Belt_Array.reverse(outerState._0);
+      
+    }
+  };
+}
+
+function newVersion(arr) {
+  return newVersionInner({
+              TAG: /* State1 */0,
+              _0: {
+                pullFrom: arr,
+                pushTo: []
+              }
+            });
+}
+
+console.log(newVersion([
+          " foo",
+          "bar "
+        ]));
+
+function checking(arr) {
+  var left = newVersion(arr.slice());
+  var right = arr.slice();
+  doThingsAndStuff(right);
+  console.log("===================");
+  console.log(left);
+  console.log(right);
+  console.log("");
+  
+}
+
+checking([
+      " foo",
+      "bar "
+    ]);
+
+checking([
+      "foo",
+      " ",
+      "bar"
+    ]);
+
+checking([
+      "   ",
+      "foo",
+      " ",
+      "bar",
+      "     "
+    ]);
+
+checking([
+      "     ",
+      " ",
+      "   "
+    ]);
+
+checking([
+      "     ",
+      "   ",
+      " "
+    ]);
+
+checking([
+      "1",
+      " 2",
+      "3 ",
+      " 4 ",
+      "  5",
+      "6  ",
+      "  7  ",
+      "8 8 8",
+      " 9 9 "
+    ]);
+
+checking([
+      "a",
+      " b",
+      "c ",
+      "d",
+      "eeeee",
+      "f  f",
+      "gg",
+      "  "
+    ]);
 
 exports.doThingsAndStuff = doThingsAndStuff;
 exports.insertAt = insertAt;
-exports.nextAction = nextAction;
-/* No side effect */
+exports.advanceState1 = advanceState1;
+exports.arrContains = arrContains;
+exports.advanceState2 = advanceState2;
+exports.advanceState3 = advanceState3;
+exports.newVersionInner = newVersionInner;
+exports.newVersion = newVersion;
+exports.checking = checking;
+/*  Not a pure module */
