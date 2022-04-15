@@ -231,14 +231,24 @@ Jest.describe("Main - insertAt", (function (param) {
                             "foo"
                           ]);
               }));
-        return Jest.test("insertAt beyond array range inserts at last position", (function (param) {
-                      return Jest.Expect.toEqual(Jest.Expect.expect(Main.insertAt(3, "foo", [
+        Jest.test("insertAt beyond array range inserts at last position", (function (param) {
+                return Jest.Expect.toEqual(Jest.Expect.expect(Main.insertAt(3, "foo", [
+                                    "bar",
+                                    "baz"
+                                  ])), [
+                            "bar",
+                            "baz",
+                            "foo"
+                          ]);
+              }));
+        return Jest.test("insertAt with negative value inserts at 0", (function (param) {
+                      return Jest.Expect.toEqual(Jest.Expect.expect(Main.insertAt(-1, "foo", [
                                           "bar",
                                           "baz"
                                         ])), [
+                                  "foo",
                                   "bar",
-                                  "baz",
-                                  "foo"
+                                  "baz"
                                 ]);
                     }));
       }));
@@ -268,6 +278,64 @@ Jest.describe("Main - advanceState1", (function (param) {
                                   }
                                 });
                     }));
+      }));
+
+Jest.describe("Main - compare doThingsAndStuff with newVersion", (function (param) {
+        var compareTest = function (msg, arr) {
+          var left = Main.newVersion(arr.slice());
+          var right = arr.slice();
+          Main.doThingsAndStuff(right);
+          return Jest.test(msg, (function (param) {
+                        return Jest.Expect.toEqual(Jest.Expect.expect(left), right);
+                      }));
+        };
+        compareTest("2 kepts strings", [
+              " foo",
+              "bar "
+            ]);
+        compareTest("1 kept, 2 dropped", [
+              "foo",
+              " ",
+              "bar"
+            ]);
+        compareTest("3 kept, 2 dropped", [
+              "   ",
+              "foo",
+              " ",
+              "bar",
+              "     "
+            ]);
+        compareTest("ordering of only spaces", [
+              "     ",
+              " ",
+              "   "
+            ]);
+        compareTest("ordering of only spaces slightly different order", [
+              "     ",
+              "   ",
+              " "
+            ]);
+        compareTest("lots of strings with numbers", [
+              "1",
+              " 2",
+              "3 ",
+              " 4 ",
+              "  5",
+              "6  ",
+              "  7  ",
+              "8 8 8",
+              " 9 9 "
+            ]);
+        return compareTest("lots of string with letters", [
+                    "a",
+                    " b",
+                    "c ",
+                    "d",
+                    "eeeee",
+                    "f  f",
+                    "gg",
+                    "  "
+                  ]);
       }));
 
 /*  Not a pure module */

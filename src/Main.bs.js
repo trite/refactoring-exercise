@@ -85,8 +85,9 @@ var doThingsAndStuff = (function(x) {
     });
 
 function insertAt(start, toInsert, arr) {
-  var arrStart = Belt_Array.slice(arr, 0, start);
-  var arrEnd = Belt_Array.slice(arr, start, arr.length - start | 0);
+  var safeStart = Math.max(0, start);
+  var arrStart = Belt_Array.slice(arr, 0, safeStart);
+  var arrEnd = Belt_Array.slice(arr, safeStart, arr.length - start | 0);
   return Belt_Array.concatMany([
               arrStart,
               [toInsert],
@@ -126,7 +127,9 @@ function advanceState2(state) {
   var charTest = state.examining.charCodeAt(state.examPosition);
   var nextPosition = state.examPosition + 1 | 0;
   if (charTest === 32.0) {
+    console.log("as2 path 1");
     if (state.pushTo.length > 0) {
+      console.log("as2 path 1.1");
       return {
               TAG: /* State3 */2,
               _0: {
@@ -143,6 +146,7 @@ function advanceState2(state) {
               }
             };
     } else {
+      console.log("as2 path 1.2");
       return {
               TAG: /* State2 */1,
               _0: {
@@ -155,33 +159,38 @@ function advanceState2(state) {
             };
     }
   }
-  if (!Number.isNaN(charTest)) {
+  if (Number.isNaN(charTest)) {
+    console.log("as2 path 2");
+    var pushTo = state.spaceInExam && !arrContains(state.examining, state.pushTo) ? (console.log("as2 path 2.1"), Belt_Array.concat(state.pushTo, [state.examining])) : (console.log("as2 path 2.1"), state.pushTo);
     return {
-            TAG: /* State2 */1,
+            TAG: /* State1 */0,
             _0: {
               pullFrom: state.pullFrom,
-              pushTo: state.pushTo,
-              examining: state.examining,
-              examPosition: nextPosition,
-              spaceInExam: state.spaceInExam
+              pushTo: pushTo
             }
           };
   }
-  var pushTo = state.spaceInExam && !arrContains(state.examining, state.pushTo) ? Belt_Array.concat(state.pushTo, [state.examining]) : state.pushTo;
+  console.log("as2 path 3");
   return {
-          TAG: /* State1 */0,
+          TAG: /* State2 */1,
           _0: {
             pullFrom: state.pullFrom,
-            pushTo: pushTo
+            pushTo: state.pushTo,
+            examining: state.examining,
+            examPosition: nextPosition,
+            spaceInExam: state.spaceInExam
           }
         };
 }
 
 function advanceState3(state) {
+  console.log("as3 open");
   if (state.spaceInCompare) {
+    console.log("top of if");
     var examCharCode = state.examining.charCodeAt(state.examPosition);
     var compareCharCode = state.comparing.charCodeAt(state.comparePosition);
     if (Number.isNaN(examCharCode) || examCharCode < compareCharCode) {
+      console.log("as3 path 1");
       return {
               TAG: /* State1 */0,
               _0: {
@@ -191,6 +200,7 @@ function advanceState3(state) {
             };
     }
     if (examCharCode === compareCharCode) {
+      console.log("as3 path 2");
       return {
               TAG: /* State3 */2,
               _0: {
@@ -207,6 +217,7 @@ function advanceState3(state) {
               }
             };
     }
+    console.log("as3 path 3");
     var pushTo = arrContains(state.examining, state.pushTo) ? state.pushTo : Belt_Array.concat(state.pushTo, [state.examining]);
     return {
             TAG: /* State1 */0,
@@ -216,9 +227,14 @@ function advanceState3(state) {
             }
           };
   }
-  var charTest = state.examining.charCodeAt(state.examPosition);
-  if (Number.isNaN(charTest)) {
-    var pushTo$1 = state.spaceInExam ? Belt_Array.concat(state.pushTo, [state.examining]) : state.pushTo;
+  console.log("bottom of if");
+  var examCharTest = state.examining.charCodeAt(state.examPosition);
+  var compareCharTest = state.comparing.charCodeAt(state.comparePosition);
+  if (Number.isNaN(examCharTest)) {
+    console.log("=====================");
+    var pushTo$1 = state.spaceInExam ? (
+        compareCharTest === 32.0 ? Belt_Array.concat(state.pushTo, [state.examining]) : Belt_Array.concat([state.examining], state.pushTo)
+      ) : state.pushTo;
     return {
             TAG: /* State1 */0,
             _0: {
@@ -227,7 +243,8 @@ function advanceState3(state) {
             }
           };
   }
-  var spaces = charTest === 32.0;
+  console.log("===else===");
+  var spaces = examCharTest === 32.0;
   return {
           TAG: /* State3 */2,
           _0: {
@@ -248,6 +265,7 @@ function advanceState3(state) {
 function newVersionInner(_outerState) {
   while(true) {
     var outerState = _outerState;
+    console.log(outerState);
     switch (outerState.TAG | 0) {
       case /* State1 */0 :
           _outerState = advanceState1(outerState._0);
@@ -274,11 +292,6 @@ function newVersion(arr) {
               }
             });
 }
-
-console.log(newVersion([
-          " foo",
-          "bar "
-        ]));
 
 function checking(arr) {
   var left = newVersion(arr.slice());

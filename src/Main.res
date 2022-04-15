@@ -79,8 +79,10 @@ let doThingsAndStuff = %raw(`
 `)
 
 let insertAt = (start: int, toInsert: 'a, arr: array<'a>): array<'a> => {
-    let arrStart = Belt.Array.slice(arr, ~offset=0, ~len=start)
-    let arrEnd = Belt.Array.slice(arr, ~offset=start, ~len=Belt.Array.length(arr)-start)
+    let safeStart = Js.Math.max_int(0, start)
+
+    let arrStart = Belt.Array.slice(arr, ~offset=0, ~len=safeStart)
+    let arrEnd = Belt.Array.slice(arr, ~offset=safeStart, ~len=Belt.Array.length(arr)-start)
     Belt.Array.concatMany([arrStart, [toInsert], arrEnd])
 }
 
@@ -208,8 +210,10 @@ let advanceState2 = (state: state2<string>): anyState<string> => {
     let nextPosition = state.examPosition + 1
 
     if (charTest == 32.0) {
+        Js.log("as2 path 1")
         if (Js.Array.length(state.pushTo) > 0) {
-            // Character being tested is a space, begin comparing it with values in the "pushTo" field
+            Js.log("as2 path 1.1")
+            // Character being tested is a space, begin comparing the position after it with values in the "pushTo" field
             State3({
                 pullFrom: state.pullFrom,
                 pushTo: state.pushTo,
@@ -225,6 +229,7 @@ let advanceState2 = (state: state2<string>): anyState<string> => {
                 spaceInCompare: false
             })
         } else {
+            Js.log("as2 path 1.2")
             State2({
                 ...state,
                 spaceInExam: true,
@@ -244,12 +249,15 @@ let advanceState2 = (state: state2<string>): anyState<string> => {
             // })
         }
     } else if (Js.Float.isNaN(charTest)) {
+        Js.log("as2 path 2")
         // End of the string, add the item to "pushTo" if it contained a space
         let pushTo =
             // if (state.spaceInExam && Belt.Option.isNone(Js.Array.find(x => x == state.examining, state.pushTo))) {
             if (state.spaceInExam && !arrContains(state.examining, state.pushTo)) {
+                Js.log("as2 path 2.1")
                 Belt.Array.concat(state.pushTo, [state.examining])
             } else {
+                Js.log("as2 path 2.1")
                 state.pushTo
             }
 
@@ -258,6 +266,7 @@ let advanceState2 = (state: state2<string>): anyState<string> => {
             pushTo: pushTo
         })
     } else {
+        Js.log("as2 path 3")
         // Not a space but not the end of the string, just advance the pointer
         State2({
             ...state,
@@ -274,10 +283,10 @@ let advanceState2 = (state: state2<string>): anyState<string> => {
 let advanceState3 = (state: state3<string>): anyState<string> => {
     open Js.String
     open Js.Float
-    // Js.log("as3 open")
+    Js.log("as3 open")
 
     if (state.spaceInCompare) {
-        // Js.log("top of if")
+        Js.log("top of if")
         // do comparison for where to insert
 
         let examCharCode =
@@ -289,19 +298,22 @@ let advanceState3 = (state: state3<string>): anyState<string> => {
             |> charCodeAt(state.comparePosition)
 
         if (isNaN(examCharCode) || examCharCode < compareCharCode ) {
-            // Js.log("as3 path 1")
+            Js.log("as3 path 1")
+            
             State1({
                 pullFrom: state.pullFrom,
                 pushTo: state.pushTo |> insertAt(state.comparingSource - 1, state.examining)
             })
         } else if (examCharCode == compareCharCode) {
-            // Js.log("as3 path 2")
+            Js.log("as3 path 2")
+
             State3({
                 ...state,
                 examPosition: state.examPosition + 1,
             })
         } else {
-            // Js.log("as3 path 3")
+            Js.log("as3 path 3")
+
             let pushTo =
                 if (arrContains(state.examining, state.pushTo)) {
                     state.pushTo
@@ -315,24 +327,43 @@ let advanceState3 = (state: state3<string>): anyState<string> => {
             })
         }
     } else {
-        // Js.log("bottom of if")
+        Js.log("bottom of if")
+
         // checking for spaces still
-        let charTest = state.examining |> charCodeAt(state.examPosition)
+        let examCharTest =
+            state.examining
+            |> charCodeAt(state.examPosition)
+
+        let compareCharTest =
+            state.comparing
+            |> charCodeAt(state.comparePosition)
+
         // Js.log(charTest)
-        if (isNaN(charTest)) {
-            // Js.log("=====================")
+        if (isNaN(examCharTest)) {
+            Js.log("=====================")
+            // let pushTo =
+            //     (state.spaceInExam && (compareCharTest != 32.0))
+            //         ? Belt.Array.concat([state.examining], state.pushTo)
+            //         : Belt.Array.concat(state.pushTo, [state.examining])
             let pushTo =
-                state.spaceInExam
-                    ? Belt.Array.concat(state.pushTo, [state.examining])
-                    : state.pushTo
+                if state.spaceInExam {
+                    if compareCharTest == 32.0 {
+                        Belt.Array.concat(state.pushTo, [state.examining])
+                    } else {
+                        Belt.Array.concat([state.examining], state.pushTo)
+                    }
+                } else {
+                    state.pushTo
+
+                }
 
             State1({
                 pullFrom: state.pullFrom,
                 pushTo: pushTo
             })
         } else {
-            // Js.log("===else===")
-            let spaces = charTest == 32.0
+            Js.log("===else===")
+            let spaces = examCharTest == 32.0
 
             State3({
                 ...state,
@@ -344,7 +375,7 @@ let advanceState3 = (state: state3<string>): anyState<string> => {
 }
 
 let rec newVersionInner = (outerState: anyState<string>): array<string> => {
-    // Js.log(outerState)
+    Js.log(outerState)
     switch outerState {
         | State1(state) =>
             state
@@ -377,7 +408,7 @@ let newVersion = (arr: array<string>): array<string> => {
 //     pushTo: []
 // }))
 
-Js.log(newVersion([" foo", "bar "]))
+// Js.log(newVersion([" foo", "bar "]))
 
 let checking = (arr: array<string>) => {
     let left = newVersion(Js.Array.copy(arr))
