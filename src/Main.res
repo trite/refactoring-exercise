@@ -129,5 +129,5 @@ type comparing<'a> =
 }
 
 let x = ["a", " b", "c ", "d", "eeeee", "f  f", "gg", "  "]
-doThingsAndStuff(x) |> ignore
+doThingsAndStuff(x) -> ignore
 Js.log(x)

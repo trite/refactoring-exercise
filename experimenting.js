@@ -76,36 +76,39 @@ var doThingsAndStuff = x => {
     };
 };
 
-// function print(msg, x) {
-//     console.log(msg + '["' + x.join('", "') + '"]');
-// }
+function print(msg, x) {
+    console.log(msg + '["' + x.join('", "') + '"]');
+}
 
-// function test(x) {
-//     print("Before: ", x);
-//     doThingsAndStuff(x);
-//     print("Once  : ", x);
-//     doThingsAndStuff(x);
-//     print("Twice : ", x);
-//     doThingsAndStuff(x);
-//     print("Thrice: ", x);
-//     doThingsAndStuff(x);
-//     print("Last  : ", x);
-//     console.log("");
-// }
+function test(x) {
+    print("Input : ", x);
+    doThingsAndStuff(x);
+    print("Once  : ", x);
+    doThingsAndStuff(x);
+    print("Twice : ", x);
+    doThingsAndStuff(x);
+    print("Thrice: ", x);
+    doThingsAndStuff(x);
+    print("Last  : ", x);
+    console.log("");
+}
 
-// test(["1", " 2", "3 ", " 4 ", "  5", "6  ", "  7  ", "8 8 8", " 9 9 "])
-// test(["          ", "       blah  ", " ", "another one with multiple words", "    ", " foo", "   bar", " baz", "      ", "words with spaces between"]);
-// test([" 1", "2 "])
-// test(["2 ", " 1"])
+test([" 2", "3 ", " 4 ", "  5", "6  ", "1", "  7  ", "8 8 8", " 9 9 "])
+test(["1", " 4 ", "8 8 8", " 9 9 ", "  5", "6  ", " 2", "3 ", "  7  "])
+test(["8 8 8",  "3 ", " 2", " 4 ", "1", "  5", " 9 9 ", "6  ","  7  "])
 
-// test(["a", " b", "c ", "d", "eeeee", "f  f", "gg", "  "]);
-// test(["a", " b", "c ", "  ", "d", "eeeee", "f  f", "gg"]);
-// test(["a", "c ", "f  f", "  ", "d", "eeeee", " b", "gg"]);
+test(["          ", "       blah  ", " ", "another one with multiple words", "    ", " foo", "   bar", " baz", "      ", "words with spaces between"]);
+test([" 1", "2 "])
+test(["2 ", " 1"])
 
-// test([" ", "   ", "     "])
-// test(["   ", " ", "     "])
-// test(["     ", "   ", " "])
+test(["a", " b", "c ", "d", "eeeee", "f  f", "gg", "  "]);
+test(["a", " b", "c ", "  ", "d", "eeeee", "f  f", "gg"]);
+test(["a", "c ", "f  f", "  ", "d", "eeeee", " b", "gg"]);
 
-var x = ["a", " b", "c ", "d", "eeeee", "f  f", "gg", "  "];
-doThingsAndStuff(x);
-console.log(x);
+test([" ", "   ", "     "])
+test(["   ", " ", "     "])
+test(["     ", "   ", " "])
+
+// var x = ["a", " b", "c ", "d", "eeeee", "f  f", "gg", "  "];
+// doThingsAndStuff(x);
+// console.log(x);

@@ -1,8 +1,8 @@
-open Jest;
+open Jest
 
 describe("Main - doThingsAndStuff", () => {
-    open Main;
-    open Expect;
+    open Main
+    open Expect
 
     // doThingsAndStuff tests
     let testExpect = (toSort, expectedResult, msg) => {
@@ -60,11 +60,11 @@ describe("Main - doThingsAndStuff", () => {
     testExpect(["     ", " ", "   "],
                ["     ", "   ", " "],
                "spaces that finish reordering on second run")
-});
+})
 
 describe("Main - insertAt", () => {
-    open Main;
-    open Expect;
+    open Main
+    open Expect
 
     // insertAt tests
     test("insertAt 0 inserts at start", () =>
@@ -81,7 +81,7 @@ describe("Main - insertAt", () => {
 
     test("insertAt with negative value inserts at 0", () =>
         expect(insertAt(-1, "foo", ["bar", "baz"])) -> toEqual(["foo", "bar", "baz"]))
-});
+})
 
 // describe("Main - advanceState1", () => {
 //     open Main;

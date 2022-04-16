@@ -1,11 +1,16 @@
-let sort = (x: array<string>): array<string> => {
-    Js.Array.sortInPlace(Js.Array.copy(x))
+// Can't really tell if the strange sorting behavior is intended.
+// If the goal was simply to filter and sort then this would work.
+
+let filterSort = (arr: array<string>, f: string => bool): array<string> => {
+    arr
+    -> Js.Array2.copy // to avoid mutating the original
+    -> Js.Array2.filter(f)
+    -> Js.Array2.sortInPlace
 }
 
-let filterSort = (x: array<string>): array<string> => {
-    x
-    |> Js.Array.filter(x => Js.String.includes(" ", x))
-    |> sort
+let filterSpaceAndSort = (arr: array<string>): array<string> => {
+    arr
+    -> filterSort(x => Js.String.includes(" ", x))
 }
 
 Js.log(filterSort(["   ", "foo", " ", "bar", "     "]))
